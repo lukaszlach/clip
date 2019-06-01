@@ -1,0 +1,31 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Enter the container shell no matter if it is bash or sh
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+#!/bin/bash
+usage() {
+cat <<EOF
+
+Usage: docker sh CONTAINER
+
+Enter the container shell no matter if it is bash or sh
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+CONTAINER="$1"
+if [ -z "$CONTAINER" ]; then
+    echo "Error: Container was not specified"
+    exit 1
+fi
+set -e
+docker exec -it "$CONTAINER" \
+    /bin/sh -c "[ -e /bin/bash ] && exec /bin/bash || exec /bin/sh"
+exit 0

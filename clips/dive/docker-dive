@@ -1,0 +1,32 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Explore contents of the image layers with the Dive tool
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+#!/bin/bash
+usage() {
+cat <<EOF
+
+Usage: docker dive IMAGE
+
+Explore contents of the image layers with the Dive tool
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+IMAGE="$1"
+if [ -z "$IMAGE" ]; then
+    echo "Error: Image was not specified"
+    exit 1
+fi
+set -e
+docker run --rm -it \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    wagoodman/dive:latest "$IMAGE"
+exit 0

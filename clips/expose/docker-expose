@@ -1,0 +1,83 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Expose a container HTTP publicly on the Internet
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+usage() {
+cat <<EOF
+
+Usage: docker expose [OPTIONS] CONTAINER PORT
+
+Expose a container HTTP publicly on the Internet
+
+Options:
+  -f                         Force and stop the existing proxy, if running
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+FORCE=0
+if [ "$1" == "-f" ]; then
+    shift
+    FORCE=1
+fi
+if docker ps --format '{{.Names}}' | grep -e "^clip-expose$" &>/dev/null; then
+    if [ "$FORCE" == "0" ]; then
+        echo "Error: Only one container can be exposed at a time, use -f to force"
+        exit 1
+    fi
+fi
+CONTAINER_NAME="$1"
+CONTAINER_PORT="$2"
+CONTAINER_ID=$(docker inspect --format '{{.Id}}' "$CONTAINER_NAME")
+if [ $? != 0 ]; then
+    echo "Error: Container $CONTAINER_NAME does not exist"
+    exit 1
+fi
+CONTAINER_SHORT_ID=$(echo "$CONTAINER_ID" | cut -c 1-12)
+CONTAINER_STATUS=$(docker inspect --format '{{.State.Status}}' "$CONTAINER_NAME")
+if [ "$CONTAINER_STATUS" != "running" ]; then
+    echo "Error: Container $CONTAINER_NAME is not running"
+    exit 1
+fi
+
+for NETWORK_CONTAINER in $(docker network inspect --format '{{range .Containers}}{{.Name}} {{end}}' clip-expose-network 2>/dev/null); do
+    docker network disconnect -f clip-expose-network "$NETWORK_CONTAINER"
+done
+docker network rm clip-expose-network >/dev/null
+set -e
+echo "Creating network"
+docker network create -d bridge clip-expose-network >/dev/null
+docker network connect clip-expose-network "$CONTAINER_NAME"
+docker rm -f clip-expose >/dev/null || true
+echo "Starting proxy for $CONTAINER_NAME:$CONTAINER_PORT"
+PROXY_CONTAINER=$(docker run -d -it --name clip-expose \
+    --net clip-expose-network \
+    wernight/ngrok \
+    ngrok http \
+        --log /dev/stdout --log-format term \
+        "$CONTAINER_SHORT_ID:$CONTAINER_PORT"
+)
+if [ $? != 0 ]; then
+    echo "Error: Failed to start proxy container"
+    exit 1
+fi
+echo "Proxy is running, fetching public address details"
+LOG_COUNT=0
+while read LOG_STRING; do
+    if ! echo "$LOG_STRING" | grep 'url=' >/dev/null; then
+        continue
+    fi
+    echo "$LOG_STRING" | grep -oe 'url=.*' | cut -c 5-
+    LOG_COUNT=$(((LOG_COUNT+1)))
+    if [ $LOG_COUNT == 2 ]; then
+        break
+    fi
+done < <(docker logs -f clip-expose)
+echo "Successfully exposed $CONTAINER_NAME:$CONTAINER_PORT"
+exit 0

@@ -1,0 +1,59 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Scan the image with Aqua Microscanner
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+#!/bin/bash
+usage() {
+cat <<EOF
+
+Usage: docker microscan --token TOKEN IMAGE
+
+Scan the image with Aqua Microscanner
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+if [ "$1" == "--token" ]; then
+    AQUA_TOKEN="$2"
+    shift 2
+fi
+IMAGE="$1"
+if [ -z "$IMAGE" ]; then
+    echo "Error: Image was not specified"
+    exit 1
+fi
+if [ -z "$AQUA_TOKEN" ]; then
+    echo "Error: Aqua access token was not specified"
+    exit 1
+fi
+set -e
+docker build --force-rm --no-cache -t docker-clip-microscan - <<EOF
+FROM $IMAGE
+USER root
+ADD https://get.aquasec.com/microscanner .
+RUN ( \
+        apk add --no-cache ca-certificates || \
+        ( apt-get update && apt-get install -y ca-certificates ) || \
+        dnf install ca-certificates || \
+        yum install ca-certificates || \
+        false \
+    ) && \
+    chmod +x ./microscanner && \
+    ./microscanner $AQUA_TOKEN
+EOF
+SCAN_RESULT=$?
+docker rmi docker-clip-microscan &>/dev/null
+if [ $SCAN_RESULT == 0 ]; then
+    echo "No critical vulnerabilities found in $IMAGE"
+else
+    echo "Error: Image $IMAGE failed the security scan"
+    exit 1
+fi
+exit 0

@@ -1,0 +1,32 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Get the command needed to create an exact copy of the container
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+#!/bin/bash
+usage() {
+cat <<EOF
+
+Usage: docker runlike CONTAINER
+
+Get the command needed to create an exact copy of the container
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+CONTAINER="$1"
+if [ -z "$CONTAINER" ]; then
+    echo "Error: Container was not specified"
+    exit 1
+fi
+set -e
+docker run --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    assaflavie/runlike "$CONTAINER"
+exit 0

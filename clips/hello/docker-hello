@@ -1,0 +1,10 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Hello World
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+#!/bin/bash
+echo Hello World
+exit 0

@@ -1,0 +1,111 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Publish a port on a running container using a TCP proxy
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+usage() {
+cat <<EOF
+
+Usage: docker publish CONTAINER PORT
+
+Publish a port on a running container using a TCP proxy
+
+Publish the port
+$ docker publish add container_name 80
+
+Stop publishing the port
+$ docker publish rm 80
+
+List additionally published ports
+$ docker publish ls
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+cmd_add() {
+    CONTAINER_NAME="$1"
+    BIND="$2"
+    if [ -z "$CONTAINER_NAME" ] || [ -z "$BIND" ]; then
+        echo "Error: Not enough arguments"
+        usage
+        exit 1
+    fi
+    PORT=$(echo "$BIND" | rev | cut -d ':' -f 1 | rev) # IPv6
+    CONTAINER_ID=$(docker inspect --format '{{.Id}}' "$CONTAINER_NAME")
+    if [ $? != 0 ]; then
+        echo "Error: Container $CONTAINER_NAME does not exist"
+        exit 1
+    fi
+    CONTAINER_SHORT_ID=$(echo "$CONTAINER_ID" | cut -c 1-12)
+    CONTAINER_STATUS=$(docker inspect --format '{{.State.Status}}' "$CONTAINER_NAME")
+    if [ "$CONTAINER_STATUS" != "running" ]; then
+        echo "Error: Container $CONTAINER_NAME is not running"
+        exit 1
+    fi
+    PROXY_CONTAINER="clip-publish-$PORT"
+    PROXY_CONTAINER_STATUS=$(docker inspect --format '{{.State.Status}}' "$PROXY_CONTAINER" 2>/dev/null)
+    if [ "$PROXY_CONTAINER_STATUS" == "running" ]; then
+        echo "Error: Proxy publishing the port $PORT is already running"
+        exit 1
+    fi
+    docker network connect clip-publish-network "$CONTAINER_SHORT_ID" &>/dev/null
+    # "--pid container" makes the container exit when parent exists
+    docker run --rm -d --name "clip-publish-$PORT" \
+        --pid "container:$CONTAINER_SHORT_ID" \
+        --net clip-publish-network -p "$BIND:$PORT" \
+        -e "LISTEN=:$PORT" -e "TALK=$CONTAINER_SHORT_ID:$PORT" \
+        -l "com.docker.clip.publish.parent=$CONTAINER_SHORT_ID" \
+        -l "com.docker.clip.publish.parent_name=$CONTAINER_NAME" \
+        -l "com.docker.clip.publish.bind=$BIND" \
+        -l "com.docker.clip.publish.port=$PORT" \
+        tecnativa/tcp-proxy
+    if [ $? != 0 ]; then
+        echo "Error: Failed to start proxy container"
+        exit 1
+    fi
+    echo "Successfully published $CONTAINER_NAME:$PORT"
+}
+cmd_rm() {
+    PORT="$1"
+    if [ -z "$PORT" ]; then
+        echo "Error: Not enough arguments"
+        usage
+        exit 1
+    fi
+    PROXY_CONTAINER="clip-publish-$PORT"
+    PROXY_CONTAINER_STATUS=$(docker inspect --format '{{.State.Status}}' "$PROXY_CONTAINER")
+    if [ $? != 0 ] || [ "$PROXY_CONTAINER_STATUS" != "running" ]; then
+        echo "Error: Proxy publishing the port $PORT is not running"
+        exit 1
+    fi
+    PARENT_CONTAINER=$(docker inspect --format '{{index .Config.Labels "com.docker.clip.publish.parent"}}' "$PROXY_CONTAINER")
+    (
+        docker network disconnect -f clip-publish-network "$PARENT_CONTAINER"
+        docker stop "$PROXY_CONTAINER"
+    ) &>/dev/null
+    echo "Successfully stopped publishing $CONTAINER_NAME:$PORT"
+}
+cmd_ls() {
+    printf "PORT\t\tCONTAINER\n"
+    while read PROXY_CONTAINER; do
+        PARENT_CONTAINER_NAME=$(docker inspect --format '{{index .Config.Labels "com.docker.clip.publish.parent_name"}}' "$PROXY_CONTAINER")
+        PORT=$(docker inspect --format '{{index .Config.Labels "com.docker.clip.publish.port"}}' "$PROXY_CONTAINER")
+        printf "$PORT\t\t$PARENT_CONTAINER_NAME\n"
+    done < <(docker ps --format '{{.Names}}' | grep -e '^clip-publish-')
+}
+docker network create -d bridge clip-publish-network &>/dev/null
+COMMAND="$1"
+shift
+case "$COMMAND" in
+  add) cmd_add "$@" ;;
+  rm)  cmd_rm "$@" ;;
+  ls)  cmd_ls "$@" ;;
+esac
+
+exit 0
