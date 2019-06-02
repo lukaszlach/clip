@@ -24,11 +24,13 @@ $ docker info | grep clip
 $ docker clip --help
 ```
 
-There are a lot of ready plugins available in this repository and already published on Docker Hub. You can [install](#install-the-plugin) them with a single `docker clip add` command. If you do not like one of the plugins you can [remove](#remove-the-plugin) it using the `docker clip rm` command.
+There are a lot of ready plugins available in this repository and already published on Docker Hub. [Search](#search-for-plugin) through the remote plugin catalog using `docker clip search` command.
+
+You can [install](#install-the-plugin) them with a single `docker clip add` command. If you do not like one of the plugins you can [remove](#remove-the-plugin) it using the `docker clip rm` command.
 
 * [expose](clips/expose/) - Expose your container on the Internet, anytime, for any time ([see how it works](clips/expose/record.gif))
 * [publish](clips/publish/) - Publish a port on a running container
-* [showcontext](clips/showcontext/) - Display the contents of the build context ([see how it works](clips/showcontext/record.gif))
+* [showcontext](clips/showcontext/) - Display contents of the build context ([see how it works](clips/showcontext/record.gif))
 * [microscan](clips/microscan/) - Scan the image with Aqua Microscanner
 * [dive](clips/dive/) - Explore contents of the image layers ([see how it works](clips/dive/record.gif))
 * [runlike](clips/runlike/) - Get the command line necessary to run a copy of any container
@@ -77,6 +79,31 @@ The command lists all additional Docker client plugins installed and maintained 
 $ docker clip ls
 COMMAND      IMAGE
 microscan    lukaszlach/clips:microscan
+```
+
+## Search for plugin
+
+```
+docker clip search [PATTERN]
+```
+
+Search the remote plugin catalog:
+
+```bash
+$ docker clip search security
+COMMAND         IMAGE                           DESCRIPTION
+microscan       lukaszlach/clips:microscan      Scan the security of an image with Aqua Microscanner
+```
+
+Specifying a pattern is optional, the command will list all plugins if it is not passed:
+
+```bash
+$ docker clip search
+COMMAND         IMAGE                           DESCRIPTION
+dive            lukaszlach/clips:dive           Explore contents of the image layers
+expose          lukaszlach/clips:expose         Expose container HTTP port on the Internet
+hello           lukaszlach/clips:hello          Hello World
+...
 ```
 
 ## Build new plugin

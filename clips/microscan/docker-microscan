@@ -1,6 +1,6 @@
 #!/bin/bash
 # Docker Client Plugin Manager (CLIP)
-# Scan the image with Aqua Microscanner
+# Scan the security of an image with Aqua Microscanner
 #
 # (c) 2019 Łukasz Lach
 #   llach@llach.pl

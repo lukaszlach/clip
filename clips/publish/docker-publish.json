@@ -2,5 +2,5 @@
   "SchemaVersion": "0.1.0",
   "Vendor": "Łukasz Lach",
   "Version": "v19.06.0",
-  "ShortDescription": "Expose container HTTP port on the Internet"
+  "ShortDescription": "Publish a port on a running container using a TCP proxy"
 }

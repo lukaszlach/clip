@@ -162,17 +162,23 @@ cmd_rm() {
 # docker clip ls
 #
 cmd_ls() {
-    if [ ! -d "$USER_LOCAL_DIR/.command" ]; then
-        echo "No plugins are currently installed"
-        exit 0
-    fi
-
     printf "COMMAND\t\tIMAGE\n"
     while read PLUGIN_IMAGE_FILE; do
         PLUGIN_TAG=$(cat "$PLUGIN_IMAGE_FILE")
         PLUGIN_COMMAND=$(basename $(dirname "$PLUGIN_IMAGE_FILE"))
         printf "$PLUGIN_COMMAND\t\t$PLUGIN_TAG\n"
     done < <(find "$USER_LOCAL_DIR/.command" -name .plugin-image)
+}
+
+#
+# docker clip search
+#
+cmd_search() {
+    PATTERN="$1"
+    printf "COMMAND         IMAGE                           DESCRIPTION\n"
+    curl -sSfL https://raw.githubusercontent.com/lukaszlach/clip/master/clips/catalog | \
+        grep --color=always -ie "$PATTERN"
+    exit $?
 }
 
 #
@@ -200,7 +206,7 @@ shift
 COMMAND="$1"
 shift
 case "$COMMAND" in
-    build | push | add | update | rm | ls | run)
+    build | push | add | update | rm | ls | search | run)
       eval "cmd_${COMMAND}" "$@"
     ;;
 esac
