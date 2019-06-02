@@ -28,6 +28,7 @@ There are a lot of ready plugins available in this repository and already publis
 
 * [expose](clips/expose/) - Expose your container on the Internet, anytime, for any time ([see how it works](clips/expose/record.gif))
 * [publish](clips/publish/) - Publish a port on a running container
+* [showcontext](clips/showcontext/) - Display the contents of the build context ([see how it works](clips/showcontext/record.gif))
 * [microscan](clips/microscan/) - Scan the image with Aqua Microscanner
 * [dive](clips/dive/) - Explore contents of the image layers ([see how it works](clips/dive/record.gif))
 * [runlike](clips/runlike/) - Get the command line necessary to run a copy of any container

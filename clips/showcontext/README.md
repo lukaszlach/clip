@@ -1,12 +1,14 @@
 # lukaszlach / clips / showcontext
 
-Display the contents of a build context.
+Display the contents of the build context.
+
+![](https://raw.githubusercontent.com/lukaszlach/clip/master/clips/showcontext/record.gif)
 
 ```
 docker showcontext DIR
 ```
 
-Does does not expose the contents of the build context it archives and sends to the Docker Engine during a build process. This plugin allows you to list all the files that would be archived by a `docker build` command pointing the same build context directory in `DIR`. All patterns stored in a `.dockerignore` file are also properly handled.
+Docker does not show the contents of the build context it archives and sends to the Docker Engine during a build process. This plugin allows you to list all the files that would be archived by a `docker build` command pointing the same build context directory in `DIR`. All patterns stored in the `.dockerignore`, if present, file are also properly handled.
 
 ## Install
 
@@ -21,7 +23,6 @@ If you are in the project directory you can call `docker showcontext` to list al
 ```bash
 $ docker showcontext .
 Building the image layer
-sha256:df688826b55984164f762ca4239cc7ffa25d0a876f65a780b0418f02ce6b9058
 Build context contents:
 drwxr-xr-x  0 root   root        0 Jun  2 12:58 .git/
 -rw-r--r--  0 root   root       21 Jun  1 18:49 .git/COMMIT_EDITMSG
@@ -37,17 +38,14 @@ drwxr-xr-x  0 root   root        0 Jun  1 17:30 .git/hooks/
 You can see the `.git` directory is included in the build context, exclude it and check again:
 
 ```bash
-$ echo '.git' >> .dockerignore
-
-$ docker showcontext . | head
+$ echo .git >> .dockerignore
+$ docker showcontext .
 Building the image layer
-sha256:f9be5444fb025e06e0758a658dbf5c2294013e565dd84ff10a4a63b0d2af7ccd
 Build context contents:
 -rw-r--r--  0 root   root       39 Jun  2 12:59 .dockerignore
 -rw-r--r--  0 root   root     1086 Jun  2 12:52 LICENSE.md
 -rw-r--r--  0 root   root     6130 Jun  2 12:48 README.md
 drwxr-xr-x  0 root   root        0 Jun  2 12:36 clips/
--rw-r--r--  0 root   root     6148 May 31 21:41 clips/.DS_Store
 drwxr-xr-x  0 root   root        0 Jun  2 12:48 clips/dive/
 -rw-r--r--  0 root   root      280 Jun  1 17:41 clips/dive/Makefile
 ```

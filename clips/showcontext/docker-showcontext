@@ -36,7 +36,7 @@ cat > "$DOCKEFILE_FILE" <<EOF
 FROM scratch
 COPY . .
 EOF
-docker build -q --force-rm --no-cache -t "$IMAGE_TAG" -f "$DOCKEFILE_FILE" "$BUILD_CONTEXT_DIR"
+docker build -q --force-rm --no-cache -t "$IMAGE_TAG" -f "$DOCKEFILE_FILE" "$BUILD_CONTEXT_DIR" &>/dev/null
 IMAGE_DIR=$(mktemp -d)
 docker save "$IMAGE_TAG" | tar -C "$IMAGE_DIR" -x
 echo "Build context contents:"
