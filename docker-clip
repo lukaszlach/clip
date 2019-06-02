@@ -10,7 +10,7 @@ cat <<CUT
      "SchemaVersion": "0.1.0",
      "Vendor": "Łukasz Lach",
      "Version": "v19.06.0",
-     "ShortDescription": "Docker Client Plugin Manager"
+     "ShortDescription": "Docker Client Plugins Manager"
 }
 CUT
 exit
@@ -163,8 +163,8 @@ cmd_rm() {
 #
 cmd_ls() {
     if [ ! -d "$USER_LOCAL_DIR/.command" ]; then
-        echo "No plugins currently installed"
-        exit
+        echo "No plugins are currently installed"
+        exit 0
     fi
 
     printf "COMMAND\t\tIMAGE\n"

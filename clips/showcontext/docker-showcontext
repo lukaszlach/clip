@@ -1,0 +1,46 @@
+#!/bin/bash
+# Docker Client Plugin Manager (CLIP)
+# Display the contents of the build context
+#
+# (c) 2019 Łukasz Lach
+#   llach@llach.pl
+#   https://lach.dev
+usage() {
+cat <<EOF
+
+Usage: docker showcontext DIR
+
+Display the contents of the build context
+
+EOF
+}
+shift
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    usage
+    exit 0
+fi
+BUILD_CONTEXT_DIR="$1"
+if [ -z "$BUILD_CONTEXT_DIR" ]; then
+    echo "Error: Build context directory was not specified"
+    exit 1
+fi
+if [ ! -d "$BUILD_CONTEXT_DIR" ]; then
+    echo "Error: $BUILD_CONTEXT_DIR is not a directory"
+    exit 1
+fi
+set -e
+IMAGE_TAG="clip-showcontext"
+DOCKEFILE_FILE=$(mktemp)
+echo "Building the image layer"
+cat > "$DOCKEFILE_FILE" <<EOF
+FROM scratch
+COPY . .
+EOF
+docker build -q --force-rm --no-cache -t "$IMAGE_TAG" -f "$DOCKEFILE_FILE" "$BUILD_CONTEXT_DIR"
+IMAGE_DIR=$(mktemp -d)
+docker save "$IMAGE_TAG" | tar -C "$IMAGE_DIR" -x
+echo "Build context contents:"
+find "$IMAGE_DIR" -name 'layer.tar' -exec tar -tvf {} \;
+rm -rf "$IMAGE_DIR" "$DOCKEFILE_FILE"
+docker rmi "$IMAGE_TAG" &>/dev/null
+exit 0

@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-19.06.0-lightgrey.svg?style=flat)
 
-**Docker Client Plugins Manager** (CLIP) is a Docker client plugin allowing to create, build new Docker client plugins in any programming language, publish them on Docker Hub or just try some plugins from the catalog and install them locally. Project is written entirely in Bash.
+**Docker Client Plugins Manager** (CLIP) is a Docker client plugin allowing to create, build new [Docker client plugins](https://github.com/docker/cli/issues/1534) in any programming language, publish them on Docker Hub or just try some plugins from the catalog and install them locally. Project is written entirely in Bash.
 
 [![](https://raw.githubusercontent.com/lukaszlach/clip/master/clips/dive/record.gif)](clips/dive/)
 
@@ -19,7 +19,7 @@ It should be automatically detected by the Docker client:
 
 ```bash
 $ docker info | grep clip
-  clip: Docker Client Plugin Manager (Łukasz Lach, v19.06.0)
+  clip: Docker Client Plugins Manager (Łukasz Lach, v19.06.0)
 
 $ docker clip --help
 ```
@@ -99,12 +99,21 @@ The manifest file is used by Docker Client to fetch details about the plugin and
 {
   "SchemaVersion": "0.1.0",
   "Vendor": "Łukasz Lach",
-  "Version": "v19.06.0",
+  "Version": "v1.0",
   "ShortDescription": "Hello World"
 }
 ```
 
-Any other files present in the build context directory will be added along with the binary and manifest, your plugin can use and depend on these files to be present on the client disk after installation. After you are ready with the plugin code, build the plugin image with the `docker clip build` command:
+The script stored in `docker-hello` can be as simple as:
+
+```bash
+#!/bin/sh
+echo Hello World
+```
+
+Any other files present in the build context directory will be added along with the binary and manifest, your plugin can use and depend on these files to be present on the client disk after installation.
+
+After you are ready with the plugin code, build the plugin image with the `docker clip build` command:
 
 ```bash
 $ docker clip build -c hello -t lukaszlach/clips:hello .

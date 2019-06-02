@@ -1,0 +1,6 @@
+{
+  "SchemaVersion": "0.1.0",
+  "Vendor": "Łukasz Lach",
+  "Version": "v19.06.0",
+  "ShortDescription": "Display the contents of the build context"
+}

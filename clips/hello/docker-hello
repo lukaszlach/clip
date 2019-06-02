@@ -5,6 +5,5 @@
 # (c) 2019 Łukasz Lach
 #   llach@llach.pl
 #   https://lach.dev
-#!/bin/bash
 echo Hello World
 exit 0
