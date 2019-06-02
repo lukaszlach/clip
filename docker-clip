@@ -162,6 +162,11 @@ cmd_rm() {
 # docker clip ls
 #
 cmd_ls() {
+    if [ ! -d "$USER_LOCAL_DIR/.command" ]; then
+        echo "No plugins currently installed"
+        exit
+    fi
+
     printf "COMMAND\t\tIMAGE\n"
     while read PLUGIN_IMAGE_FILE; do
         PLUGIN_TAG=$(cat "$PLUGIN_IMAGE_FILE")
