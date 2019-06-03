@@ -58,7 +58,7 @@ docker rm -f clip-expose >/dev/null || true
 echo "Starting proxy for $CONTAINER_NAME:$CONTAINER_PORT"
 PROXY_CONTAINER=$(docker run -d -it --name clip-expose \
     --net clip-expose-network \
-    wernight/ngrok \
+    lukaszlach/ngrok \
     ngrok http \
         --log /dev/stdout --log-format term \
         "$CONTAINER_SHORT_ID:$CONTAINER_PORT"

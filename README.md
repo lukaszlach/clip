@@ -64,7 +64,7 @@ You can uninstall the plugin with the `docker clip rm` command:
 
 ```bash
 $ docker clip rm expose
-Successfully removed 'microscan' client command
+Successfully removed 'expose' client command
 ```
 
 ## List plugins
