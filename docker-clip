@@ -162,11 +162,11 @@ cmd_rm() {
 # docker clip ls
 #
 cmd_ls() {
-    printf "COMMAND\t\tIMAGE\n"
+    printf "%-20s %s\n" COMMAND IMAGE
     while read PLUGIN_IMAGE_FILE; do
         PLUGIN_TAG=$(cat "$PLUGIN_IMAGE_FILE")
         PLUGIN_COMMAND=$(basename $(dirname "$PLUGIN_IMAGE_FILE"))
-        printf "$PLUGIN_COMMAND\t\t$PLUGIN_TAG\n"
+        printf "%-20s %s$\n" "$PLUGIN_COMMAND" "$PLUGIN_TAG"
     done < <(find "$USER_LOCAL_DIR/.command" -name .plugin-image)
 }
 
