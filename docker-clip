@@ -203,18 +203,17 @@ cat <<EOF
 Usage: docker clip COMMAND
   
 Commands:
-  add      Installs a new plugin by image name, use search to list available plugins
-  build    Builds a new plugin locally
-  ls       Lists installed plugins
-  push     Pushes local plugin to docker registry
-  rm       Removes installed plugin
-  search   Lists all plugins from the remote catalog
-  update   Reinstalls latest version of a plugin
+  add       Install a new plugin by an image name
+  build     Build a new plugin
+  ls        List installed plugins
+  push      Push local plugin to a Docker registry
+  rm        Remove an installed plugin
+  search    Search plugins from the remote catalog
+  update    Reinstall a plugin to its latest version
 
 EOF
 }
 
-set -e
 if [ $EUID == 0 ]; then
    echo "Error: Cannot run as root"
    exit 1
@@ -228,6 +227,7 @@ if [ -z "$COMMAND" ] || [ "$COMMAND" == "-h" ] || [ "$COMMAND" == "--help" ]; th
     exit 0
 fi
 
+set -e
 case "$COMMAND" in
     build | push | add | update | rm | ls | search | run)
       eval "cmd_${COMMAND}" "$@"
