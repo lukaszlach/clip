@@ -197,6 +197,23 @@ cmd_run() {
     exit 0
 }
 
+usage() {
+cat <<EOF
+
+Usage: docker clip COMMAND
+  
+Commands:
+  add      Installs a new plugin by image name, use search to list available plugins
+  build    Builds a new plugin locally
+  ls       Lists installed plugins
+  push     Pushes local plugin to docker registry
+  rm       Removes installed plugin
+  search   Lists all plugins from the remote catalog
+  update   Reinstalls latest version of a plugin
+
+EOF
+}
+
 set -e
 if [ $EUID == 0 ]; then
    echo "Error: Cannot run as root"
@@ -205,6 +222,12 @@ fi
 shift
 COMMAND="$1"
 shift
+
+if [ -z "$COMMAND" ] || [ "$COMMAND" == "-h" ] || [ "$COMMAND" == "--help" ]; then
+    usage
+    exit 0
+fi
+
 case "$COMMAND" in
     build | push | add | update | rm | ls | search | run)
       eval "cmd_${COMMAND}" "$@"
