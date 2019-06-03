@@ -158,6 +158,10 @@ You can now test the plugin locally by simply installing it or push it to the re
 $ docker clip push lukaszlach/clips:hello
 ```
 
+## Contributors
+
+[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/0)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/0)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/1)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/1)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/2)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/2)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/3)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/3)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/4)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/4)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/5)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/5)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/6)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/6)[![](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/images/7)](https://sourcerer.io/fame/lukaszlach/lukaszlach/clip/links/7)
+
 ## Licence
 
 MIT License
