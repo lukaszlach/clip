@@ -214,10 +214,6 @@ Commands:
 EOF
 }
 
-if [ $EUID == 0 ]; then
-   echo "Error: Cannot run as root"
-   exit 1
-fi
 shift
 COMMAND="$1"
 shift
